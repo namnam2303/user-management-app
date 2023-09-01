@@ -1,0 +1,42 @@
+<mat-card class="mat-card">
+  <mat-card-content>
+    <div class="header">
+      <h2>User Management System</h2>
+    </div>
+    <form (ngSubmit)="onLogin(loginForm.value)" [formGroup]="loginForm">
+      <mat-form-field class="mat-form-field">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username">
+        <mat-error *ngIf="!loginForm.get('username').valid && loginForm.get('username').touched">
+          Required username
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="mat-form-field">
+        <mat-label>Enter your password</mat-label>
+        <input matInput [type]="hide ? 'password' : 'text'" formControlName='password'>
+        <button type="none" class="btn-hide" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hide">
+          <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-error *ngIf="!loginForm.get('password').valid">
+          Required password
+        </mat-error>
+      </mat-form-field>
+      <div class="forgot_pass">
+        <span>
+          <a class="text-link" routerLink="/user/resetpassword">Forgot Password?</a>
+        </span>
+      </div>
+      <button type="submit" [disabled]="loginForm.invalid || showLoading" name="button"
+        class="btn login_btn btn-danger">
+        {{showLoading ? "Loading..." : "Login"}}
+      </button>
+    </form>
+    <div class="button-row">
+      <div>
+        Don't have an account? <a routerLink="/register" class="link-danger">Sign Up</a>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

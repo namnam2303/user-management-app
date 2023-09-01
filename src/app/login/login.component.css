@@ -1,0 +1,31 @@
+.mat-card {
+    max-width: 600px;
+    margin: 8em auto;
+    text-align: center;
+    height: auto;
+    padding-bottom: 1em;
+}
+.mat-form-field{
+    display: block;
+    max-width: 100%;
+    margin: 1em auto;
+}
+.btn-hide{
+    border: none;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2em;
+}
+a {
+    text-decoration: none;
+}
+.login_btn{
+    margin-bottom: 1em;
+}
+.forgot_pass {
+    display: block;
+    text-align-last: right;
+    margin-bottom: 1em;
+}

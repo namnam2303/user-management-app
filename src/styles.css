@@ -1,0 +1,6 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~/node_modules/bootstrap/dist/css/bootstrap.min.css";
+@import 'ngx-toastr/toastr';
+@import 'https://use.fontawesome.com/releases/v5.8.1/css/all.css';
+@import 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css';

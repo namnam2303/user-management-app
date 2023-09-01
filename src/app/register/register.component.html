@@ -1,0 +1,49 @@
+<mat-card class="mat-card">
+    <mat-card-content>
+        <div class="header">
+            <h2>Register form</h2>
+        </div>
+        <form (ngSubmit)="onRegister(registerForm.value)" [formGroup]="registerForm">
+            <mat-form-field class="mat-form-field">
+                <mat-label>First Name</mat-label>
+                <input matInput formControlName="firstName">
+                <mat-error *ngIf="!registerForm.get('firstName').valid && registerForm.get('firstName').touched">
+                    Required first name
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="mat-form-field">
+                <mat-label>Last Name</mat-label>
+                <input matInput formControlName="lastName">
+                <mat-error *ngIf="!registerForm.get('lastName').valid && registerForm.get('lastName').touched">
+                  Required last name
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field class="mat-form-field">
+                <mat-label>Username</mat-label>
+                <input matInput formControlName="username">
+                <mat-error *ngIf="!registerForm.get('username').valid && registerForm.get('username').touched">
+                  Required username
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field class="mat-form-field">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email">
+                <mat-error *ngIf="!registerForm.get('email').valid && registerForm.get('email').touched">
+                  Invalid email format.
+                </mat-error>
+              </mat-form-field>
+            <button type="submit" [disabled]="registerForm.invalid && !showLoading"
+                class="btn register_btn btn-primary">
+                {{showLoading ? "Loading..." : "Register"}}
+            </button>
+        </form>
+        <div class="button-row">
+            <div>
+                Already have an account? <a routerLink="/login" class="link-primary">Log In</a>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

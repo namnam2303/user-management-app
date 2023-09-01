@@ -1,0 +1,225 @@
+<div class="main-content">
+      <div>
+        <h2>User management Portal</h2>
+      </div>
+      <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" (click)="showUserTable()"><i class="fa fa-users"  ></i>Users</a>
+  
+        <a class="nav-item link-primary welcome" (click)="showUserInformation()">Welcome, {{user?.firstName}}
+           <i class="fa fa-user"></i></a>
+      </nav>
+      <div class="search-refresh">
+        <input class="form-control search"  matInput (keyup) = 'applyFilter($event)' placeholder="Search">
+        <button class="btn btn-primary" (click)="getUsers()">
+          <i *ngIf="refreshing" class="fas fa-sync fa-spin"></i> <i *ngIf="!refreshing" class="fas fa-sync"></i>
+        </button>
+      </div>
+      
+      <div class="users-table container" id="users-table">
+        <table class="table table-hover">
+          <thead>
+            <tr class="text-center">
+              <th scope="col">Photo</th>
+              <th scope="col">User ID</th>
+              <th scope="col">First name</th>
+              <th scope="col">Last Name</th>
+              <th scope="col">Username</th>
+              <th scope="col">Email</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of filterUsers" class="text-center" >
+              <td (click) = "onSelectUser(user)"><img height="40" width="40" src="{{user?.profileImageUrl}}" class="rounded-circle img-fluid img-thumbnail" alt=""/></td>
+              <td (click) = "onSelectUser(user)">{{user?.userId}}</td>
+              <td (click) = "onSelectUser(user)">{{user?.firstName}}</td>
+              <td (click) = "onSelectUser(user)">{{user?.lastName}}</td>
+              <td (click) = "onSelectUser(user)">{{user?.username}}</td>
+              <td (click) = "onSelectUser(user)">{{user?.email}}</td>
+              <td (click) = "onSelectUser(user)"><span [hidden]="!user?.active" class="badge badge-success">Active</span>
+                <span [hidden]="user?.active" class="badge badge-danger">Inactive</span></td>
+              <td>
+                <div>
+                  <button class="btn" (click)="onEditUser(user)"><i class="fas fa-edit"></i></button>
+                  <button [hidden]="!isAdminOrManager" class="btn btn-outline-danger" (click)="onDeleteUser(user?.username)"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+<div class="modal" id="userModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      
+      <div class="modal-header">
+        <h4 class="modal-title">{{selectedUser?.firstName + ' ' + selectedUser?.lastName}}</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal">
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div>
+          <div class="">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-12 col-sm-auto">
+                  <div class="mx-auto">
+                    <div class="d-flex justify-content-center align-items-center rounded">
+                      <img class="rounded" height="120" width="120" src="{{selectedUser?.profileImageUrl}}" alt="{{selectedUser?.firstName}}">
+                    </div>
+                  </div>
+                </div>
+                <div class="col d-flex flex-column flex-sm-row justify-content-between">
+                  <div class="text-left text-sm-left mb-sm-0">
+                    <strong class="pt-sm-2 pb-1 mb-0 text-nowrap">{{selectedUser?.firstName}}
+                      {{selectedUser?.lastName}}</strong>
+                    <p class="mb-1">{{selectedUser?.username}}</p>
+                    <div class="">Status:
+                      <span [hidden]="!selectedUser?.active" class="badge badge-success">Active</span>
+                      <span [hidden]="selectedUser?.active" class="badge badge-danger">Inactive</span>
+                    </div>
+                    <div >
+                      <small *ngIf="selectedUser?.lastLoginDateDisplay">Last Login: {{selectedUser?.lastLoginDateDisplay | date: 'medium'}}</small>
+                      <small *ngIf="!selectedUser?.lastLoginDateDisplay">User have never logged in</small>
+                    </div>
+                  </div>
+                  <div class="text-center text-sm-right">
+                    <div class="text-muted"><small>Joined {{selectedUser?.joinDate | date: 'mediumDate'}}</small></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item"></li>
+              <li class="list-group-item"><i class="fa fa-id-badge float-right"></i>{{selectedUser?.userId}}
+              </li>
+              <li class="list-group-item"><i class="fa fa-envelope float-right"></i>{{selectedUser?.email}}
+              </li>
+              <li class="list-group-item"><i class="fas fa-shield-alt float-right"></i>{{selectedUser?.role.substring(5)}}
+              <li *ngIf="selectedUser?.lastLoginDateDisplay" class="list-group-item"><i
+                  class="fas fa-sign-in-alt float-right"></i>{{selectedUser?.lastLoginDateDisplay | date: 'medium'}}
+              </li>
+              <li class="list-group-item">
+                <span [hidden]="selectedUser?.notLocked">
+                  <i class="fa fa-lock float-right" style="color: red;">
+                  </i>
+                  Account Locked
+                </span>
+                <span [hidden]="!selectedUser?.notLocked">
+                  <i class="fa fa-unlock float-right" style="color: green;">
+                  </i>
+                  Account Unlocked
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger"  data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!--Edit modal-->
+<div class="modal fade" id="userUpdateModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">{{editUser?.firstName +" " + editUser?.lastName}} {{user?.role==="ROLE_USER" ? "(read only)" : ""}}</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div class="">
+          <form #editUserForm="ngForm">
+            <div class="form-group">
+              <label >First Name</label>
+              <input type="text" name="firstName" [disabled]="!isManager" required
+                [(ngModel)]="editUser.firstName" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" name="lastName" [disabled]="!isManager" required
+                [(ngModel)]="editUser.lastName" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" name="username" [disabled]="!isManager" required
+                [(ngModel)]="editUser.username" class="form-control">
+            </div>
+            <div class="form-group">
+              <label >Email</label>
+              <input type="email" name="email" [disabled]="!isManager" required [(ngModel)]="editUser.email"
+                class="form-control">
+            </div>
+            <div class="form-group">
+              <label >Role <small [hidden]="!isManager">(read only)</small></label>
+                <select name="role" [disabled]="!isAdmin" required [(ngModel)]="editUser.role" class="form-control">
+                  <option value="ROLE_USER">USER</option>
+                  <option value="ROLE_HR">HR</option>
+                  <option value="ROLE_MANAGER">MANAGER</option>
+                  <option value="ROLE_ADMIN">ADMIN</option>
+                  <option value="ROLE_SUPER_ADMIN">SUPER ADMIN</option>
+                </select>
+            </div>
+            <div class="input-group mb-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Profile Picture </span>
+              </div>
+              <div class="custom-file">
+                <input type="file" accept="image/*" [disabled]="!isManager" name="profileImage"
+                  (change)="onProfileImageChange($event)"
+                  class="custom-file-input">
+                <label class="custom-file-label"><span [hidden]="!fileName">{{fileName}}</span>
+                  <span [hidden]="fileName">Choose File</span>
+                </label>
+              </div>
+            </div>
+            <fieldset class="form-group">
+              <div class="form-check">
+                <label class="form-check-label">
+                  <input name="active" type="checkbox" [disabled]="!isManager" [(ngModel)]="editUser.active"
+                    class="form-check-input">
+                  Acitve <small [hidden]="isManager">(read only)</small>
+                </label>
+              </div>
+              <div class="form-check disabled">
+                <label class="form-check-label">
+                  <input name="locked" type="checkbox" [disabled]="!isManager" [(ngModel)]="editUser.notLocked"
+                    class="form-check-input">
+                  Unlocked <small [hidden]="isManager">(read only)</small>
+                </label>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" (click)="onUpdateUser()" [disabled]="editUserForm.invalid || !isAdminOrManager" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+
+<button type="button" class="hidden btn-primary" id="userModalBtn" data-bs-toggle="modal" data-bs-target="#userModal">
+  Open user detail modal
+</button>
+<button type="button" class="hidden btn-primary" id="editUserBtn" data-bs-toggle="modal" data-bs-target="#userUpdateModal">
+  Open user update modal
+</button>
+</div>
