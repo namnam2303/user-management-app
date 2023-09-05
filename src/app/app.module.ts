@@ -1,52 +1,36 @@
-import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import { AuthenticationService } from './service/authentication.service';
+import { UserService } from './service/user.service';
+import { AuthInterceptor } from './interceptor/auth.interceptor';
+import { AuthenticationGuard } from './guard/authentication.guard';
+import { NotificationModule } from './notification.module';
+import { NotificationService } from './service/notification.service';
 import { LoginComponent } from './login/login.component';
-import {MatCardModule} from '@angular/material/card';
-import { FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
-import {MatIconModule} from '@angular/material/icon';
-import {MatGridListModule} from '@angular/material/grid-list';
-import { NotifierModule } from 'angular-notifier';
-import { ToastrModule } from 'ngx-toastr';
-import { UserComponent } from './user/user.component';
 import { RegisterComponent } from './register/register.component';
-import { ModalModule } from 'ngx-bootstrap/modal';
-
+import { UserComponent } from './user/user.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    UserComponent,
-    RegisterComponent
+    RegisterComponent,
+    UserComponent
   ],
   imports: [
     BrowserModule,
-    ModalModule.forRoot(),
     AppRoutingModule,
-    HttpClientModule, 
     FormsModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    BrowserAnimationsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatGridListModule,
-    NotifierModule,
-    ToastrModule.forRoot({
-      timeOut: 3000,
-      progressBar: false,
-      enableHtml: true
-    }),
-    BrowserAnimationsModule
+    HttpClientModule,
+    NotificationModule
   ],
-  providers: [],
+  providers: [NotificationService, AuthenticationGuard, AuthenticationService, UserService,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true } ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
