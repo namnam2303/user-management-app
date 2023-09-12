@@ -11,6 +11,8 @@ import { AuthenticationService } from '../service/authentication.service';
 import { Router } from '@angular/router';
 import { FileUploadStatus } from '../model/file-upload.status';
 import { Role } from '../enum/role.enum';
+import { ToastrService } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-user',
@@ -32,7 +34,8 @@ export class UserComponent implements OnInit, OnDestroy {
   public fileStatus = new FileUploadStatus();
 
   constructor(private router: Router, private authenticationService: AuthenticationService,
-              private userService: UserService, private notificationService: NotificationService) {}
+              private userService: UserService, private notificationService: NotificationService,
+              private toast : ToastrService) {}
 
   ngOnInit(): void {
     this.user = this.authenticationService.getUserFromLocalCache();
@@ -69,9 +72,24 @@ export class UserComponent implements OnInit, OnDestroy {
     this.clickButton('openUserInfo');
   }
 
-  public onProfileImageChange(fileName: string, profileImage: File): void {
-    this.fileName =  fileName;
-    this.profileImage = profileImage;
+  public onProfileImageChange(events: any) {
+    let listUploaded = events.target.files;
+    if (listUploaded.length > 0) {
+      if (this.isImageFile(listUploaded[0])) {
+        this.fileName = listUploaded[0].name;
+        this.profileImage = listUploaded[0];
+        this.toast.success('Upload file successfully!');
+        return;
+      }
+    }
+    this.fileName = null;
+    this.profileImage = null;
+    this.toast.error('Not image file');
+  }
+  private isImageFile(file: File): boolean {
+    // Define an array of allowed image MIME types
+    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
+    return allowedImageTypes.includes(file.type);
   }
 
   public saveNewUser(): void {
